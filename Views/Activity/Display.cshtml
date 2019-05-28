@@ -1,0 +1,62 @@
+@model DActivity
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#">Dojo Activity Center</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="/dashboard">Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="logout" href="/logout">Logout</a>
+            </li>
+        </ul>
+</nav>
+<div class="container">
+    <div class="form-group">
+        <h1>@ViewBag.Activity.Title</h1>
+    </div>
+    <div class="row">
+        <div class="col-lg-10">
+            <h2>Event Coordinator: @ViewBag.Activity.Planner.FirstName</h2>
+            <h2>Description:</h2>
+            <p>@ViewBag.Activity.Description</p>
+            <h2>Participants:</h2>
+            <ul>
+                @{
+                    foreach(var activity in ViewBag.Activity.Participants)
+                    {
+                        <li>@activity.User.FirstName</li>
+                    }
+                }
+            </ul>
+        </div>
+        <div class="col-lg-2">
+            @{
+                bool Attending = false;
+                foreach(var join in ViewBag.Activity.Participants)
+                    {
+                        if(join.User == ViewBag.User)
+                        {
+                            Attending = true;
+                        }
+                    }
+                if(ViewBag.Activity.Planner.UserId == ViewBag.User.UserId && Attending)
+                {
+                    <a href="/delete/@ViewBag.Activity.ActivityId" class="btn btn-info">Delete</a>
+                }
+                else if(Attending && ViewBag.Activity.Planner.UserId != ViewBag.User.UserId)
+                {
+                    <a href="leave/@ViewBag.Activity.ActivityId/@ViewBag.User.UserId" class="btn btn-info">Leave</a>
+                }
+                else
+                {
+                    <a href="join/@ViewBag.Activity.ActivityId/@ViewBag.User.UserId" class="btn btn-info">Join</a>
+                }
+            }
+        </div>
+    </div>
+</div>
