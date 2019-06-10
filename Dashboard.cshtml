@@ -1,0 +1,70 @@
+@model List<DActivity>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="navbar-header">
+    <h1 class="navbar-brand" href="#">Dojo Activity Center</h1>
+    </div>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        
+        <ul class="nav navbar-nav navbar-right" list-style-type="none">
+            <li class="nav-item">
+                <a class="nav-link" href="#">Welcome, @ViewBag.User.FirstName!</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/logout"><button class="btn btn-info">Logout</button></a>
+            </li>
+        </ul>
+        </div>
+</nav>
+<table class = "table table-striped">
+    <thead>
+        <th>Activity</th>
+        <th>Date and Time</th>
+        <th>Duration</th>
+        <th>Event Coordinator</th>
+        <th>No. of Participants</th>
+        <th>Actions</th>
+    </thead>
+    <tbody>
+        @{
+                foreach(var activity in ViewBag.Activities)
+                {
+                    DateTime ActivityDate = DateTime.Parse(activity.Date);
+                    DateTime CurrentDate = DateTime.Today;
+                    if(ActivityDate < CurrentDate){
+                        continue;
+                    }
+                    bool Attending = false;
+                    foreach(var join in activity.Participants)
+                    {
+                        if(join.User == ViewBag.User)
+                        {
+                            Attending = true;
+                        }
+                    }
+                    <tr>
+                        <th scope="row"><a href="/activity/@activity.ActivityId">@activity.Title</a></th>
+                        <td>@activity.Date @@ @activity.Time</td>
+                        <td>@activity.Duration</td>
+                        <td>@activity.Planner.FirstName</td>
+                        <td>@activity.Participants.Count</td>
+                        @{
+                            if(activity.Planner.UserId == ViewBag.User.UserId && Attending)
+                            {
+                                <td><a href="/delete/@activity.ActivityId">Delete</a></td>
+                            }
+                            else if(Attending && activity.Planner.UserId != ViewBag.User.UserId)
+                            {
+                                <td><a href="leave/@activity.ActivityId/@ViewBag.User.UserId">Leave</a></td>
+                            }
+                            else
+                            {
+                                <td><a href="join/@activity.ActivityId/@ViewBag.User.UserId">Join</a></td>
+                            }
+                        }
+                    </tr>
+                }
+            }
+        </tbody>
+</table>
+<a href="new"><button class="btn btn-info">New Activity</button></a> 
